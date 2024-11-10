@@ -16,7 +16,7 @@ By using this project you agree to not spam scryfall's api service. These tools 
 
 ## Pre-Reqs
 
-1.  Clone this repo `github.com/geekstories/mtg-stuff`
+1.  Clone this repo `gh repo clone GeekStories/MTG-Grabber`
 2.  Open a terminal and run `npm install` to install all the dependencies
 3.  Place your Postgres database connection url in the `.env` file. (a default localhost connection string is provided already)
 4. Create a table called `cards` in your database (use `./sql/cards.sql` for the defaults)
