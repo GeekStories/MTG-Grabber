@@ -2,8 +2,8 @@ const fs = require("fs");
 const https = require("https");
 const http = require("http");
 
-const cards = JSON.parse(fs.readFileSync("cards.json", "utf8"));
-const BASE_DIR = "./images";
+const cards = JSON.parse(fs.readFileSync("../output/cards.json", "utf8"));
+const BASE_DIR = "../output/images";
 const TIMEOUT = 10000; // 10 seconds timeout for each download
 
 if (!fs.existsSync(BASE_DIR)) fs.mkdirSync(BASE_DIR, { recursive: true });

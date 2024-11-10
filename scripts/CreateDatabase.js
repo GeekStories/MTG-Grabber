@@ -13,7 +13,7 @@ async function loadData() {
   await client.connect();
 
   // Load JSON data from file
-  const rawData = fs.readFileSync("./cards.json", "utf8");
+  const rawData = fs.readFileSync("../output/cards.json", "utf8");
   const cards = JSON.parse(rawData);
 
   const totalCards = cards.length;
