@@ -1,0 +1,16 @@
+{
+  "name": "mtgimagegrabber",
+  "version": "1.0.0",
+  "description": "Download images from scryfall",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "image-downloader": "^4.3.0",
+    "pg": "^8.13.1"
+  }
+}
