@@ -21,7 +21,8 @@ async function downloadImage(card) {
   if (
     layout === "transform" ||
     layout === "modal_dfc" ||
-    layout === "art_series"
+    layout === "art_series" ||
+    layout === "reversible_card"
   ) {
     if (card_faces.length !== 2) return;
 
