@@ -1,41 +1,32 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
+const { parentPort, workerData } = require("worker_threads");
+const { Pool } = require("pg");
 
-const { Client } = require("pg");
-const fs = require("fs");
+const { chunk } = workerData;
 
-// Configure PostgreSQL client
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
+async function insertData(data) {
+  const MAX_DB_CONNECTIONS = 10; // Set based on your DB's max connections
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: MAX_DB_CONNECTIONS,
+  });
 
-async function loadData() {
-  // Connect to the database
-  await client.connect();
-
-  // Load JSON data from file
-  const rawData = fs.readFileSync("../output/cards.json", "utf8");
-  const cards = JSON.parse(rawData);
-
-  const totalCards = cards.length;
-
-  // Prepare SQL insert statement (PARTIAL DATA INSERT)
-  const query = `
-    INSERT INTO cards (
-      card_id, name, lang, released_at, scryfall_uri, layout, image_status, image_uris,
-      mana_cost, cmc, type_line, oracle_text, colors, color_identity, keywords,
-      produced_mana, card_faces, legalities, set_id, set, set_name, scryfall_set_uri,
-      collector_number, rarity, card_back_id, artist, artist_ids
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-      $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
-    );
-  `;
-
+  const client = await pool.connect();
   try {
-    // Insert each card into the database
-    for (let i = 0; i < totalCards; i++) {
-      const card = cards[i];
+    const query = `
+        INSERT INTO cards (
+          card_id, name, lang, released_at, scryfall_uri, layout, image_status, image_uris,
+          mana_cost, cmc, type_line, oracle_text, colors, color_identity, keywords,
+          produced_mana, card_faces, legalities, set_id, set, set_name, scryfall_set_uri,
+          collector_number, rarity, card_back_id, artist, artist_ids
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
+          $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
+        ) ON CONFLICT(card_id) DO NOTHING;
+      `;
 
+    let count = 0;
+    for (const card of data) {
       // We only take some of the data provided from the json file. You can adjust this as needed.
       const {
         id: card_id, // Rename original `id` to `card_id`
@@ -98,18 +89,18 @@ async function loadData() {
         JSON.stringify(artist_ids),
       ]);
 
-      // Update progress in the console
-      process.stdout.write(`\rProcessing card ${i + 1} of ${totalCards}`);
-    }
+      count += 1;
 
-    console.log("\nData successfully inserted");
+      if (count % 10 == 0)
+        parentPort.postMessage({ workerId: workerData.id, count });
+    }
+    parentPort.postMessage(data.length);
   } catch (err) {
-    console.error("\nError inserting data:", err.stack);
+    console.error("Database error:", err);
   } finally {
-    // Close the database connection
-    await client.end();
+    client.release();
+    pool.end(); // Close the pool when done
   }
 }
 
-// Start the update
-loadData();
+insertData(chunk).then(() => process.exit());
