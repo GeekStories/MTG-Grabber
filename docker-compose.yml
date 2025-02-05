@@ -1,0 +1,18 @@
+version: '3.9'
+
+# You can use this docker-compose.yml file to start up a local PostgreSQL instance.
+# Run the `command docker-compose up -d` to start the docker container.
+# If you don't have the docker-compose command, then you probably need to install
+# docker. To do so hit: https://www.docker.com/ and grab Docker Desktop!
+
+services:
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
