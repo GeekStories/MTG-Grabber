@@ -62,25 +62,27 @@ The script spawns workers which each process a chunk of the overall cards data. 
 In a terminal, simply run `node ./scripts/main.js` to kick off the process!
 
 ## Downloading Card Images
+*All  images are downloaded via the Scryfall API service.*
 
-This will take a while, there are `~10.5GB` of images in total. Roughly 100k jpg files. Buckle up, because it takes a few hours. These images are gathered using the Scryfall API service. Each image is downloaded once, and on subsequent runs are skipped if they already exist. This means you can close it, and come back later.
+This will take a while, there are roughly `11GB` of images in total (about 105,000 individual jpg files). Buckle up, because it takes a few hours. 
 
-Images are named by their scryfall card id, and placed a folder which is named based on the scryfall set id of that card. This means all cards are grouped by their sets.
+- Each image is downloaded once, and on subsequent runs skipped if they already exist. This means you can close it and come back later.
+- Images are named by their scryfall card id, and placed a folder which is named based on the scryfall set id of that card. This means all cards are grouped by their sets.
+- Cards with a second face (back of the card) will use the same card id but with a -2 at the end of the name, the same convention is used in the Database for the `card_id` column.
+- Cards with 2 faces have the `layout` of `transform/modal_dfc/art_series`, so an additional image will be downloaded with these cards only if both faces have urls avaliable.
 
-Cards with a second face (on the back of the card) will use the same card id but with a -2 at the end of the name.
-
-Cards with 2 faces have the `layout` of `transform/modal_dfc/art_series`, so an additional image will be downloaded with these cards only if both faces have urls avaliable.
-
-Example of image once downloaded:
+Example of image dir once downloaded:
 
 - #### Tamiyo, Inquisitive Student // Tamiyo, Seasoned Scholar
   - `3ed80bb6-77e8-4aa7-8262-95377a38aba1` (set id)
   - `{set id}/2a717b98-cdac-416d-bf6c-f6b6638e65d1.jpg` (front)
-  - `{set id}/2a717b98-cdac-416d-bf6c-f6b6638e65d1-2.jpg` (back)
+  - `{set id}/2a717b98-cdac-416d-bf6c-f6b6638e65d1-2.jpg` (back, if one exists)
 
 ### Running the script
 
 `node ./scripts/DownloadImages.js`
+
+This command will kick off the image download process. Let this run in the background, you can stop it at any time.
 
 ## Additional Tools
 
@@ -90,4 +92,4 @@ Under `./tools` you will find `fileCounter.js`. Run this in a separate terminal 
 
 - Check your database connection
 - Check the correct data source is placed at `./output/cards.json`
-- Ensure you run the command from the root folder
+- There's probably a bug in the code, report at: [Issues](https://github.com/GeekStories/MTG-Grabber/issues)
